@@ -1,0 +1,69 @@
+version: '3'
+services:
+  # MongoDB: https://hub.docker.com/_/mongo/
+  mongodb:
+    restart: always
+    image: mongo:5.0.15
+    volumes:
+      - mongo_data:/data/db
+  # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/docker.html
+  graylog_elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    ports:
+      - 9200:9200
+      - 9300:9300
+    restart: always
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true -Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # mem_limit: 1g
+  # Graylog: https://hub.docker.com/r/graylog/graylog/
+  graylog:
+    image: graylog/graylog:5.0
+    restart: always
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+    environment:
+      # CHANGE ME (must be at least 16 characters)!
+      - GRAYLOG_PASSWORD_SECRET=123
+      - GRAYLOG_ROOT_PASSWORD_SHA2=123
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+    links:
+      - mongodb:mongo
+      - graylog_elasticsearch:elasticsearch
+    depends_on:
+      - mongodb
+      - graylog_elasticsearch
+    ports:
+      # Graylog web interface and REST API
+      - 9000:9000
+      # Syslog TCP
+      - 514:514
+      # Syslog UDP
+      - 514:514/udp
+      # GELF TCP
+      - 12201:12201
+      # GELF UDP
+      - 12201:12201/udp
+# Volumes for persisting data, see https://docs.docker.com/engine/admin/volumes/volumes/
+volumes:
+  mongo_data:
+    driver: local
+  es_data:
+    driver: local
+  graylog_data:
+    driver: local
+
+# to generate password
+# echo -n ePQhy6qG42y84BCqELcB | shasum -a 256
+
+# to check the logs in graylog
+# echo -n '{ "version": "1.1", "host": "example.org", "short_message": "A short message", "level": 5, "_some_info": "foo" }' | nc -w0 -u 127.0.0.1 12201
