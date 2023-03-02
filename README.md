@@ -10,8 +10,6 @@ Things you may want to note:
 
 * cp .example.env .env
 
-* cp .example.env .env
-
 
 * Install Docker - (https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
 * Graylog Setup -  (https://go2docs.graylog.org/5-0/downloading_and_installing_graylog/docker_installation.htm)
@@ -22,9 +20,4 @@ Things you may want to note:
 
 * (http://127.0.0.1:9000/system/inputs) -> set inputs -> GELF UDP -> Click Launch New Input -> enter title -> Click Launch Input
 * (http://127.0.0.1:9000/system/inputs) -> set inputs -> GELF HTTP -> Click Launch New Input -> enter title -> Click Launch Input
-
-
-
-
-
 

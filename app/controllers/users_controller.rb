@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
     def index
-        # test_method
+        test_method
 
         render json:{
             status: true,
